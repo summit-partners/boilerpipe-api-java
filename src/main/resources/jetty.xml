@@ -43,7 +43,28 @@
             </New>
         </Arg>
     </Call>
-    <!--<Set name="port" type="java.lang.Integer">-->
-    <!--<SystemProperty name="jetty.http.port" default="8080"/>-->
-    <!--</Set>-->
+    <Set name="handler">
+        <New id="Handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Set name="handlers">
+                <Array type="org.eclipse.jetty.server.Handler">
+                    <Item>
+                        <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection"/>
+                    </Item>
+                    <Item>
+                        <New id="DefaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+                    </Item>
+                    <Item>
+                        <New id="RequestLogHandler" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
+                    </Item>
+                </Array>
+            </Set>
+        </New>
+    </Set>
+
+
+    <Ref refid="RequestLogHandler">
+        <Set name="RequestLog">
+            <New id="RequestLog" class="org.eclipse.jetty.server.Slf4jRequestLog"/>
+        </Set>
+    </Ref>
 </Configure>
