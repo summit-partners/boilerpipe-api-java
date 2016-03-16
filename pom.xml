@@ -70,6 +70,14 @@
             <version>1.2.2</version>
         </dependency>
     </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--<jetty.threadPool.maxThreads>300</jetty.threadPool.maxThreads>-->
+        <!--<jetty.http.port>9999</jetty.http.port>-->
+    </properties>
+
+
     <build>
         <defaultGoal>compile</defaultGoal>
         <finalName>rest-api</finalName>
@@ -88,13 +96,11 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.3.8.v20160314</version>
                 <configuration>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <jettyConfig>target/classes/jetty.xml</jettyConfig>
                     <webApp>
                         <contextPath>/</contextPath>
                     </webApp>
-                    <httpConnector>
-                        <port>3000</port>
-                    </httpConnector>
+
                 </configuration>
             </plugin>
         </plugins>

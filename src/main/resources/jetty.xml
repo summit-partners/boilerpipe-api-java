@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN"
+        "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+    <Arg name="threadpool">
+        <New id="threadpool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+            <Arg type="java.lang.Integer" name="maxThreads">200</Arg>
+            <Arg type="java.lang.Integer" name="minThreads">50</Arg>
+            <Arg type="java.lang.Integer" name="idleTimeout">1000</Arg>
+            <Arg name="queue">
+                <New class="java.util.concurrent.ArrayBlockingQueue">
+                    <Arg type="java.lang.Integer">2000</Arg>
+                </New>
+            </Arg>
+            <Set name="detailedDump">false</Set>
+        </New>
+    </Arg>
+
+    <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+    </New>
+
+    <Call name="addConnector">
+        <Arg>
+            <New class="org.eclipse.jetty.server.ServerConnector">
+                <Arg name="server">
+                    <Ref refid="Server"/>
+                </Arg>
+                <Arg name="factories">
+                    <Array type="org.eclipse.jetty.server.ConnectionFactory">
+                        <Item>
+                            <New class="org.eclipse.jetty.server.HttpConnectionFactory">
+                                <Arg name="config">
+                                    <Ref refid="httpConfig"/>
+                                </Arg>
+                            </New>
+                        </Item>
+                    </Array>
+                </Arg>
+                <Set name="port" type="java.lang.Integer">
+                    <SystemProperty name="jetty.http.port" default="3000"/>
+                </Set>
+            </New>
+        </Arg>
+    </Call>
+    <!--<Set name="port" type="java.lang.Integer">-->
+    <!--<SystemProperty name="jetty.http.port" default="8080"/>-->
+    <!--</Set>-->
+</Configure>
