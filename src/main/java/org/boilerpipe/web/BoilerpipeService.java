@@ -9,10 +9,7 @@ import de.l3s.boilerpipe.sax.ImageExtractor;
 import org.jboss.resteasy.logging.Logger;
 import org.xml.sax.InputSource;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import java.io.StringReader;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +21,13 @@ public class BoilerpipeService {
 
     ArticleExtractor articleExtractor = ArticleExtractor.getInstance();
     ImageExtractor imageExtractor = ImageExtractor.getInstance();
+
+    @GET
+    @Path("/")
+    @Produces("application/json")
+    public Object hello() {
+        return new Hello();
+    }
 
     @POST
     @Path("/extract")
