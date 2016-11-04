@@ -1,5 +1,6 @@
 package com.feedpresso;
 
+import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -7,10 +8,12 @@ import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.BlockingArrayQueue;
+import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.BlockingQueue;
 
 public class StartApiServer {
@@ -42,6 +45,12 @@ public class StartApiServer {
                 createRequestLogHandler()
         });
         server.setHandler(handlers);
+
+        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+        server.addEventListener(mbContainer);
+        server.addBean(mbContainer);
+
+        server.addBean(Log.getLog());
 
         server.start();
         server.join();
