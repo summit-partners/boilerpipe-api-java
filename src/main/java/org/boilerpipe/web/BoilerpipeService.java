@@ -98,11 +98,11 @@ public class BoilerpipeService {
                             return true;
                         }
 
-                        if (getInteger(width) < 100) {
+                        if (!width.isEmpty() && getInteger(width) < 100) {
                             return false;
                         }
 
-                        if (getInteger(height) < 100) {
+                        if (!height.isEmpty() && getInteger(height) < 100) {
                             return false;
                         }
 
@@ -115,11 +115,12 @@ public class BoilerpipeService {
         }
     }
 
-    private int getInteger(String width) {
+    private int getInteger(String integer) {
         try {
-            return Integer.parseInt(width);
+            String cleanedInt = integer.replaceAll("[^\\d.]", "");
+            return Integer.parseInt(cleanedInt);
         } catch (NumberFormatException e) {
-            logger.warn("Could not Parse integer %s", width);
+            logger.warn("Could not Parse integer " + integer);
             return 0;
         }
     }
