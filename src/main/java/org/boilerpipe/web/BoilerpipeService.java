@@ -73,6 +73,26 @@ public class BoilerpipeService {
     }
 
     @POST
+    @Path("/extractImagesMeta")
+    @Consumes("text/html")
+    @Produces("application/json")
+    public List<Image> extractImagesMeta(String html) {
+        try {
+            TextDocument doc = new BoilerpipeSAXInput(new InputSource(new StringReader(html))).getTextDocument();
+            articleExtractor.process(doc);
+
+            InputSource is = new InputSource(new StringReader(html));
+
+            List<Image> process = imageExtractor.process(doc, is);
+
+            return process.stream()
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @POST
     @Path("/extractImages")
     @Consumes("text/html")
     @Produces("application/json")
