@@ -8,7 +8,7 @@ public class BoilerpipeApplication extends Application {
     private Set<Object> singletons = new HashSet<Object>();
 
     public BoilerpipeApplication() {
-        singletons.add(new BoilerpipeService());
+        singletons.add(new BoilerpipeResource());
     }
 
     @Override

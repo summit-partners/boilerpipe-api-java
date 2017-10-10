@@ -11,13 +11,14 @@ import org.xml.sax.InputSource;
 
 import javax.ws.rs.*;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Path("/")
-public class BoilerpipeService {
-    Logger logger = Logger.getLogger(BoilerpipeService.class);
+public class BoilerpipeResource {
+    Logger logger = Logger.getLogger(BoilerpipeResource.class);
 
     ArticleExtractor articleExtractor = ArticleExtractor.getInstance();
     ImageExtractor imageExtractor = ImageExtractor.getInstance();
@@ -58,15 +59,16 @@ public class BoilerpipeService {
     @Produces("application/json")
     public String extractHtml(String html) {
         try {
-            HTMLHighlighter hh = HTMLHighlighter.newExtractingInstance();
+            HTMLHighlighter htmlHighlighter = HTMLHighlighter.newExtractingInstance();
 
             InputSource is1 = new InputSource(new StringReader(html));
             TextDocument doc = new BoilerpipeSAXInput(is1).getTextDocument();
-
+//            ArticleExtractor.INSTANCE.getText(myHtml);
             articleExtractor.process(doc);
 
             InputSource is = new InputSource(new StringReader(html));
-            return hh.process(doc, is);
+            String process = htmlHighlighter.process(doc, is);
+            return process;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,8 +87,7 @@ public class BoilerpipeService {
 
             List<Image> process = imageExtractor.process(doc, is);
 
-            return process.stream()
-                    .collect(Collectors.toList());
+            return new ArrayList<>(process);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

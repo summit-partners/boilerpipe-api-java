@@ -66,10 +66,6 @@ public final class HTMLHighlighter {
 		if (extractHTML) {
 			setOutputHighlightOnly(true);
 			setExtraStyleSheet("\n<style type=\"text/css\">\n"
-					+ "A:before { content:' '; } \n" //
-					+ "A:after { content:' '; } \n" //
-					+ "SPAN:before { content:' '; } \n" //
-					+ "SPAN:after { content:' '; } \n" //
 					+ "</style>\n");
 			setPreHighlight("");
 			setPostHighlight("");
@@ -132,7 +128,7 @@ public final class HTMLHighlighter {
 	}
 
 	private static final Pattern PAT_TAG_NO_TEXT = Pattern
-			.compile("<[^/][^>]*></(?!BR)[^>]*>");
+			.compile("<[^/][^>]*></(?!BR|IMG)[^>]*>");
 	private static final Pattern PAT_SUPER_TAG = Pattern
 			.compile("^<[^>]*>(<.*?>)</[^>]*>$");
 
