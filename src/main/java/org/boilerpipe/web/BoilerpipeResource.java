@@ -4,6 +4,7 @@ import com.feedpresso.HTMLHighlighter;
 import de.l3s.boilerpipe.document.Image;
 import de.l3s.boilerpipe.document.TextDocument;
 import de.l3s.boilerpipe.extractors.ArticleExtractor;
+import de.l3s.boilerpipe.extractors.LargestContentExtractor;
 import de.l3s.boilerpipe.sax.BoilerpipeSAXInput;
 import de.l3s.boilerpipe.sax.ImageExtractor;
 import org.jboss.resteasy.logging.Logger;
@@ -44,6 +45,10 @@ public class BoilerpipeResource {
 
             if (request.extractImages) {
                 return extractImages(html);
+            }
+
+            if (request.extractText) {
+                return extractText(html);
             }
 
             throw new RuntimeException("Not Supported operation");
@@ -131,6 +136,21 @@ public class BoilerpipeResource {
                     })
                     .map(Image::getSrc)
                     .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @POST
+    @Path("/extractText")
+    @Consumes("text/html")
+    @Produces("text/plain")
+    public String extractText(String html) {
+        try {
+            InputSource is1 = new InputSource(new StringReader(html));
+            TextDocument doc = new BoilerpipeSAXInput(is1).getTextDocument();
+            LargestContentExtractor.INSTANCE.process(doc);
+            return doc.getContent();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

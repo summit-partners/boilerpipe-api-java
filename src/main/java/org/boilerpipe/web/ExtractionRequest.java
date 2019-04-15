@@ -11,4 +11,7 @@ public class ExtractionRequest {
 
     @JsonProperty("extract_images")
     boolean extractImages;
+
+    @JsonProperty("extract_text")
+    boolean extractText;
 }
