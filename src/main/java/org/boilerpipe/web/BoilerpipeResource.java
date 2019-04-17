@@ -3,8 +3,7 @@ package org.boilerpipe.web;
 import com.feedpresso.HTMLHighlighter;
 import de.l3s.boilerpipe.document.Image;
 import de.l3s.boilerpipe.document.TextDocument;
-import de.l3s.boilerpipe.extractors.ArticleExtractor;
-import de.l3s.boilerpipe.extractors.LargestContentExtractor;
+import de.l3s.boilerpipe.extractors.*;
 import de.l3s.boilerpipe.sax.BoilerpipeSAXInput;
 import de.l3s.boilerpipe.sax.ImageExtractor;
 import org.jboss.resteasy.logging.Logger;
@@ -14,7 +13,9 @@ import javax.ws.rs.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Path("/")
@@ -23,6 +24,17 @@ public class BoilerpipeResource {
 
     ArticleExtractor articleExtractor = ArticleExtractor.getInstance();
     ImageExtractor imageExtractor = ImageExtractor.getInstance();
+
+    Map<String, ExtractorBase> extractors = Stream.of(new Object[][]{
+        { "article", ArticleExtractor.INSTANCE },
+        { "articleSentecnes", ArticleSentencesExtractor.INSTANCE },
+        { "canola", CanolaExtractor.INSTANCE },
+        { "default", DefaultExtractor.INSTANCE },
+        { "keepEverything", KeepEverythingExtractor.INSTANCE },
+        // { "keepEveryingMinK", KeepEverythingWithMinKWordsExtractor.INSTANCE },
+        { "largestContent", LargestContentExtractor.INSTANCE },
+        { "numWordsRules", NumWordsRulesExtractor.INSTANCE }
+    }).collect(Collectors.toMap(data -> (String)data[0], data -> (ExtractorBase)data[1]));
 
     @GET
     @Path("/")
@@ -45,10 +57,6 @@ public class BoilerpipeResource {
 
             if (request.extractImages) {
                 return extractImages(html);
-            }
-
-            if (request.extractText) {
-                return extractText(html);
             }
 
             throw new RuntimeException("Not Supported operation");
@@ -145,11 +153,21 @@ public class BoilerpipeResource {
     @Path("/extractText")
     @Consumes("text/html")
     @Produces("text/plain")
-    public String extractText(String html) {
+    public String extractText(
+        String html, 
+        @DefaultValue("ArticleExtractor") @QueryParam("extractor") String extractorClassName
+    ) {
         try {
+            ExtractorBase extractor = this.extractors.get(extractorClassName);
+            if (extractor == null) {
+                extractor = ArticleExtractor.INSTANCE;
+            }
+
+            logger.debug("Using " + extractor + " for plain-text extraction");
+
             InputSource is1 = new InputSource(new StringReader(html));
             TextDocument doc = new BoilerpipeSAXInput(is1).getTextDocument();
-            LargestContentExtractor.INSTANCE.process(doc);
+            extractor.process(doc);
             return doc.getContent();
         } catch (Exception e) {
             throw new RuntimeException(e);
