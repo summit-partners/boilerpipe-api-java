@@ -15,7 +15,7 @@ login:
 
 push: build login
 	docker push $(TAG) || make help
-	docker push $(TAG_ENV) || make help
+	docker push $(TAG_LATEST) || make help
 
 help:
 	@echo 'Run: refresh-aws ecs-deploy if your credentials are out of date.'
