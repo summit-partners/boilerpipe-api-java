@@ -69,7 +69,7 @@ public class BoilerpipeResource {
     @POST
     @Path("/extractHtml")
     @Consumes("text/html")
-    @Produces("application/json")
+    @Produces("text/html")
     public String extractHtml(String html) {
         try {
             HTMLHighlighter htmlHighlighter = HTMLHighlighter.newExtractingInstance();
@@ -152,8 +152,8 @@ public class BoilerpipeResource {
     @POST
     @Path("/extractText")
     @Consumes("text/html")
-    @Produces("text/plain")
-    public String extractText(
+    @Produces("application/json")
+    public Object extractText(
         String html, 
         @DefaultValue("ArticleExtractor") @QueryParam("extractor") String extractorClassName
     ) {
@@ -165,10 +165,19 @@ public class BoilerpipeResource {
 
             logger.debug("Using " + extractor + " for plain-text extraction");
 
-            InputSource is1 = new InputSource(new StringReader(html));
-            TextDocument doc = new BoilerpipeSAXInput(is1).getTextDocument();
+            InputSource is = new InputSource(new StringReader(html));
+            TextDocument doc = new BoilerpipeSAXInput(is).getTextDocument();
             extractor.process(doc);
-            return doc.getContent();
+
+            // HTMLHighlighter htmlHighlighter = HTMLHighlighter.newExtractingInstance();
+            HTMLHighlighter htmlHighlighter = HTMLHighlighter.newHighlightingInstance();
+            InputSource is2 = new InputSource(new StringReader(html));
+
+            ExtractionResponse response = new ExtractionResponse();
+            response.plain = doc.getContent();
+            response.highlighted = htmlHighlighter.process(doc, is2);
+
+            return response;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
